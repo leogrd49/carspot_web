@@ -2,8 +2,12 @@
   "version": 2,
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/"
+      "src": "/assets/(.*)",      
+      "dest": "/assets/$1"       
+    },
+    {
+      "src": "/(.*)",         
+      "dest": "/"             
     }
   ]
 }
