@@ -1,4 +1,4 @@
-const Logs = () => {
+const journeaux = () => {
     return (
       <div className="space-y-6">
         <h1 className="text-4xl font-bold text-gray-800">Journaux d'Activité</h1>
@@ -45,4 +45,4 @@ const Logs = () => {
       </div>
     );
   };
-  export default Logs;
+  export default journeaux;

@@ -3,7 +3,7 @@ import Layout from './components/layout';
 import Home from './home/home.tsx';
 import Dashboard from './dashboard/dashboard.tsx';
 import Analytics from './analytics/analytics.tsx';
-import Logs from './logs/logs';
+import journeaux from './journeaux/journeaux';
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/logs" element={<Logs />} />
+          <Route path="/journeaux" element={<journeaux />} />
         </Routes>
       </Layout>
     </Router>
