@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/layout';
+import Layout from './components/layout.tsx';
 import Home from './home/home.tsx';
 import Dashboard from './dashboard/dashboard.tsx';
 import Analytics from './analytics/analytics.tsx';
-import journeaux from './journeaux/journeaux';
+import Journeaux from './journeaux/journeaux.tsx';
 
 function App() {
   return (
@@ -13,7 +13,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/analytics" element={<Analytics />} />
-          <Route path="/journeaux" element={<journeaux />} />
+          <Route path="/journeaux" element={<Journeaux />} />
         </Routes>
       </Layout>
     </Router>

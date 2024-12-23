@@ -1,4 +1,4 @@
-const journeaux = () => {
+const Journeaux = () => {
     return (
       <div className="space-y-6">
         <h1 className="text-4xl font-bold text-gray-800">Journaux d'Activité</h1>
@@ -25,19 +25,19 @@ const journeaux = () => {
                 event: "Alerte carburant bas - Véhicule #C789",
                 type: "alert"
               }
-            ].map((log, index) => (
+            ].map((journal, index) => (
               <div key={index} className="p-4 hover:bg-gray-50">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">{log.time}</span>
+                  <span className="text-sm text-gray-500">{journal.time}</span>
                   <span className={`text-sm px-2 py-1 rounded ${
-                    log.type === 'maintenance' ? 'bg-blue-100 text-blue-800' :
-                    log.type === 'journey' ? 'bg-green-100 text-green-800' :
+                    journal.type === 'maintenance' ? 'bg-blue-100 text-blue-800' :
+                    journal.type === 'journey' ? 'bg-green-100 text-green-800' :
                     'bg-red-100 text-red-800'
                   }`}>
-                    {log.type}
+                    {journal.type}
                   </span>
                 </div>
-                <p className="mt-1 text-gray-700">{log.event}</p>
+                <p className="mt-1 text-gray-700">{journal.event}</p>
               </div>
             ))}
           </div>
@@ -45,4 +45,5 @@ const journeaux = () => {
       </div>
     );
   };
-  export default journeaux;
+  
+  export default Journeaux;
