@@ -1,22 +1,51 @@
-const Dashboard = () => {
-    return (
-      <div className="space-y-6">
-        <h1 className="text-4xl font-bold text-gray-800">Tableau de Bord</h1>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
-            <h3 className="text-xl font-semibold text-blue-800">Véhicules Actifs</h3>
-            <p className="text-3xl font-bold text-blue-600 mt-2">24</p>
-          </div>
-          <div className="p-6 bg-green-50 rounded-lg border border-green-200">
-            <h3 className="text-xl font-semibold text-green-800">En Service</h3>
-            <p className="text-3xl font-bold text-green-600 mt-2">18</p>
-          </div>
-          <div className="p-6 bg-orange-50 rounded-lg border border-orange-200">
-            <h3 className="text-xl font-semibold text-orange-800">En Maintenance</h3>
-            <p className="text-3xl font-bold text-orange-600 mt-2">6</p>
-          </div>
-        </div>
-      </div>
-    );
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { MetricWithTrend, RadarMetrics, HeatMapChart, PieChartWithLegend, GaugeChart } from '../components/stats-component.tsx';
+
+const UserStatsPage = () => {
+  // Données mockées pour l'exemple
+  const statsData = {
+    totalSpots: { value: 1234, trend: 5.2 },
+    score: { value: 8750, trend: 2.8 },
+    superSpotRatio: 75,
+    topBrands: [
+      { name: 'Ferrari', value: 45 },
+      { name: 'Porsche', value: 38 },
+      { name: 'Lamborghini', value: 27 },
+      { name: 'McLaren', value: 21 },
+      { name: 'Bugatti', value: 12 }
+    ],
+    activityHeatMap: Array.from({ length: 24 * 7 }, (_, i) => ({
+      hour: i % 24,
+      day: Math.floor(i / 24),
+      value: Math.floor(Math.random() * 100)
+    }))
   };
-  export default Dashboard;
+
+  return (
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Statistiques Utilisateur</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <MetricWithTrend
+          title="Total Spots"
+          value={statsData.totalSpots.value}
+          trend={statsData.totalSpots.trend}
+        />
+        <MetricWithTrend
+          title="Score Total"
+          value={statsData.score.value}
+          trend={statsData.score.trend}
+        />
+        <GaugeChart value={statsData.superSpotRatio} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PieChartWithLegend data={statsData.topBrands} />
+        <HeatMapChart data={statsData.activityHeatMap} />
+      </div>
+    </div>
+  );
+};
+
+export default UserStatsPage;
