@@ -5,3 +5,9 @@
 nav:hover .opacity-0 {
   opacity:1;
 }
+
+@layer base {
+  :root {
+    --radius:0.5rem;
+  }
+}
