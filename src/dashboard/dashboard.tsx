@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { MetricWithTrend, RadarMetrics, HeatMapChart, PieChartWithLegend, GaugeChart } from '../components/stats-component.tsx';
+import { MetricWithTrend, RadarMetrics, HeatMapChart, PieChartWithLegend, GaugeChart } from '../components/dashboard/stats-component.tsx';
 
 const UserStatsPage = () => {
   // Données mockées pour l'exemple

@@ -1,23 +1,42 @@
-const Analytics = () => {
+  import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+  import UserStats from '../components/analytics/user-components/user-components.tsx'
+  import CarStats from '../components/analytics/car-components/car-components.tsx'
+
+  
+  // Composant principal
+  const StatsDashboard = () => {
     return (
-      <div className="space-y-6">
-        <h1 className="text-4xl font-bold text-gray-800">Analyses et Statistiques</h1>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Performance de la Flotte
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="border-l-4 border-purple-500 pl-4">
-              <h3 className="text-lg font-medium text-gray-700">Taux d'Utilisation</h3>
-              <p className="text-3xl font-bold text-purple-600">75%</p>
+      <div className="p-4">
+        <Tabs defaultValue="user" className="w-full">
+          <TabsList className="mb-4">
+            <TabsTrigger value="user">Statistiques Utilisateur</TabsTrigger>
+            <TabsTrigger value="car">Statistiques Voiture</TabsTrigger>
+            <TabsTrigger value="brand">Statistiques Marque</TabsTrigger>
+            <TabsTrigger value="community">Statistiques Communautaires</TabsTrigger>
+          </TabsList>
+  
+          <TabsContent value="user">
+            <UserStats />
+          </TabsContent>
+  
+          <TabsContent value="car">
+            <CarStats />
+          </TabsContent>
+  
+          <TabsContent value="brand">
+            <div className="text-center p-4">
+              Contenu des statistiques marque à implémenter
             </div>
-            <div className="border-l-4 border-teal-500 pl-4">
-              <h3 className="text-lg font-medium text-gray-700">Économie de Carburant</h3>
-              <p className="text-3xl font-bold text-teal-600">12%</p>
+          </TabsContent>
+  
+          <TabsContent value="community">
+            <div className="text-center p-4">
+              Contenu des statistiques communautaires à implémenter
             </div>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     );
   };
-  export default Analytics;
+  
+  export default StatsDashboard;
