@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import Logo from '../assets/LOGO_TRANSPERENT_.png';
 
 const Navbar = () => {
@@ -16,10 +16,14 @@ const Navbar = () => {
         <ul className="flex flex-col space-around h-full justify-around items-start w-full">
           {navItems.map((item) => (
             <li key={item.path} className="w-full">
-              <Link
-                to={item.path}
-                className="hover:text-[#FFC710] transition-colors flex items-center gap-4 p-2 pl-5 relative group"
-              >
+              <NavLink
+                  to={item.path}
+                  className={({ isActive }) => 
+                    `transition-colors flex items-center gap-4 p-2 pl-5 relative group ${
+                      isActive ? 'text-[#FFC710]' : 'hover:text-[#FFC710]'
+                    }`
+                  }
+                >
                 <div className="min-w-6">
                 {item.label =="Accueil" && 
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
@@ -46,7 +50,7 @@ const Navbar = () => {
                 <span className="opacity-0 nav:opacity-100 transition-all duration-300 whitespace-nowrap">
                   {item.label}
                 </span>
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>
