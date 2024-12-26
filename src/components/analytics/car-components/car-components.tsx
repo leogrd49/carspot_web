@@ -8,9 +8,9 @@ const CarStats = () => {
     return (
       <div className="flex flex-wrap gap-4">
           <SpotFrequency />
-          <PrivilegedSchedules />
           <TemporalEvolution />
           <SuperspotRatioAndPopularity />
+          <PrivilegedSchedules />
       </div>
     );
   };
