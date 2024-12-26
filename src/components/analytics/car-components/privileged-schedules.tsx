@@ -19,7 +19,7 @@ const Heatmap = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
+    <div className="w-fit">
       <Card>
         <CardHeader>
           <CardTitle>Analyse de fréquentation par jour et heure</CardTitle>
