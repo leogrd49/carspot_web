@@ -1,48 +1,54 @@
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { MetricWithTrend, RadarMetrics, HeatMapChart, PieChartWithLegend, GaugeChart } from '../components/dashboard/stats-component.tsx';
+import { useState, useEffect } from 'react';
+import { MetricWithTrend, HeatMapChart, PieChartWithLegend, GaugeChart } from '../components/dashboard/stats-component.tsx';
+import supabase from '../../utils/supabase.tsx';
 
 const UserStatsPage = () => {
-  // Données mockées pour l'exemple
-  const statsData = {
-    totalSpots: { value: 1234, trend: 5.2 },
-    score: { value: 8750, trend: 2.8 },
-    superSpotRatio: 75,
-    topBrands: [
-      { name: 'Ferrari', value: 45 },
-      { name: 'Porsche', value: 38 },
-      { name: 'Lamborghini', value: 27 },
-      { name: 'McLaren', value: 21 },
-      { name: 'Bugatti', value: 12 }
-    ],
-    activityHeatMap: Array.from({ length: 24 * 7 }, (_, i) => ({
-      hour: i % 24,
-      day: Math.floor(i / 24),
-      value: Math.floor(Math.random() * 100)
-    }))
-  };
+  const [totalSpots, setTotalSpots] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTotalSpots = async () => {
+      try {
+        const { count: spotsCount, error: spotsError } = await supabase
+          .from('user_collections')
+          .select('*', { count: 'exact', head: true })
+          .eq('spotted', true);
+
+        if (spotsError) throw spotsError;
+
+        setTotalSpots(spotsCount ?? 0);
+      } catch (error) {
+        console.error('Error fetching total spots:', error);
+        setTotalSpots(0);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTotalSpots();
+  }, []);
+
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
+
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Statistiques Utilisateur</h1>
+      <h1 className="text-3xl font-bold">Statistiques Globales</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <MetricWithTrend
           title="Total Spots"
-          value={statsData.totalSpots.value}
-          trend={statsData.totalSpots.trend}
+          value={totalSpots}
+          trend={5.2}
         />
         <MetricWithTrend
-          title="Score Total"
-          value={statsData.score.value}
-          trend={statsData.score.trend}
+          title="Nombre Model"
+          value={0}
+          trend={0}
         />
-        <GaugeChart value={statsData.superSpotRatio} />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <PieChartWithLegend data={statsData.topBrands} />
-        <HeatMapChart data={statsData.activityHeatMap} />
+        <GaugeChart value={50} />
       </div>
     </div>
   );
