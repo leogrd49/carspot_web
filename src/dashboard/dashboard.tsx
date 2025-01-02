@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { MetricWithTrend, HeatMapChart, PieChartWithLegend, GaugeChart } from '../components/dashboard/stats-component.tsx';
+import { MetricWithTrend } from '../components/dashboard/stats-component.tsx';
 import supabase from '../../utils/supabase.tsx';
 
 const UserStatsPage = () => {
   const [totalSpots, setTotalSpots] = useState(0);
+  const [totalModels, setTotalModels] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +26,25 @@ const UserStatsPage = () => {
       }
     };
 
+    const fetchTotalModels = async () => {
+      try {
+        const { count: modelsCount, error: modelsError } = await supabase
+          .from('models')
+          .select('*', { count: 'exact', head: true })
+
+        if (modelsError) throw modelsError;
+
+        setTotalModels(modelsCount ?? 0);
+      } catch (error) {
+        console.error('Error fetching total spots:', error);
+        setTotalModels(0);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchTotalSpots();
+    fetchTotalModels();
   }, []);
 
   if (isLoading) {
@@ -45,10 +64,9 @@ const UserStatsPage = () => {
         />
         <MetricWithTrend
           title="Nombre Model"
-          value={0}
+          value={totalModels}
           trend={0}
         />
-        <GaugeChart value={50} />
       </div>
     </div>
   );

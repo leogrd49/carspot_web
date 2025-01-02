@@ -1,13 +1,15 @@
 "use client"
 
-import { GitCommitVertical, TrendingUp } from "lucide-react"
+import { useState, useEffect } from "react";
+import { GitCommitVertical } from "lucide-react"
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import supabase from "../../../../utils/supabase";
+
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -17,27 +19,102 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
 
 const chartConfig = {
   desktop: {
     label: "Desktop",
     color: "hsl(var(--chart-1))",
   },
-  mobile: {
-    label: "Mobile",
-    color: "hsl(var(--chart-2))",
-  },
 } satisfies ChartConfig
 
-export function TemporalProgression() {
+// Interface pour les données du graphique
+interface ChartData {
+  month: string;
+  desktop: number;
+}
+
+interface DataItem {
+  created_at: string;
+}
+
+const TemporalProgression = () => {
+
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+ 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Requête avec jointures et comptage
+        const { data, error } = await supabase
+          .from("profiles")
+          .select(`*`)
+          
+        if (error) throw error;
+
+        // Initialisation du tableau de regroupement par mois
+        const monthlyData: DataItem[][] = Array.from({ length: 12 }, () => []);
+
+        // Parcourir tous les mois (de 0 à 11)
+        for (let month = 0; month < 12; month++) {
+          const filteredData = data.filter(item => {
+            const date = new Date(item.created_at);
+            return date.getMonth() === month; // 0 = janvier
+          });
+          
+          // Stocker les données filtrées dans le tableau par mois
+          monthlyData[month] = filteredData;
+        }
+
+        // Résultat : monthlyData contient les données de chaque mois
+        console.log(monthlyData);
+
+        
+        // Tableau des noms des mois
+        const monthNames = [
+          "January", "February", "March", "April", 
+          "May", "June", "July", "August", 
+          "September", "October", "November", "December"
+        ];
+
+        // Initialisation de la variable pour stocker la somme cumulative
+        let cumulativeSum = 0;
+
+        // Générer les données cumulatives pour le graphique
+        const chartData = monthlyData.map((monthData, index) => {
+          // Calcul de la somme cumulative
+          cumulativeSum += monthData.length;
+
+          return {
+            month: monthNames[index], // Nom du mois
+            desktop: cumulativeSum,  // Total cumulatif jusqu'à ce mois
+          };
+        });
+
+
+        setChartData(chartData);
+
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+
+  if (isLoading) return <div>Chargement en cours...</div>;
+  if (error) return <div>Erreur : {error}</div>;
+
+  
   return (
     <Card>
       <CardHeader>
@@ -89,14 +166,6 @@ export function TemporalProgression() {
           </LineChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
     </Card>
   )
 }

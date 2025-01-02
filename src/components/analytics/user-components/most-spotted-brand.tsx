@@ -1,44 +1,100 @@
-"use client"
-
-import { TrendingUp } from "lucide-react"
-import { Bar, BarChart, XAxis, YAxis } from "recharts"
-
+"use client";
+import { useState, useEffect } from "react";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
+import supabase from "../../../../utils/supabase";
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
+} from "@/components/ui/chart";
 
+// Interface pour les données du graphique
+interface ChartData {
+  brand: string;
+  modelNumber: number;
+}
+
+// Configuration du graphique
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  modelNumber: {
+    label: "Nombre de spots :",
     color: "hsl(var(--chart-1))",
   },
-} satisfies ChartConfig
+};
 
-export function MostSpottedBrand() {
+const MostSpottedBrand = () => {
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Requête avec jointures et comptage
+        const { data, error } = await supabase
+          .from("user_collections")
+          .select(`
+            model_id,
+            models (
+              brand_id,
+              brands (
+                name
+              )
+            )
+          `)
+          .eq("spotted", true);
+
+        if (error) throw error;
+
+        
+        // Transformation des données pour le graphique
+        const brandCounts = data.reduce((acc: Record<string, number>, item: any) => {
+          const brandName = item.models?.brands?.name;
+          if (brandName) {
+            acc[brandName] = (acc[brandName] || 0) + 1;
+          }
+          return acc;
+        }, {});
+
+        const formattedData: ChartData[] = Object.entries(brandCounts).map(
+          ([brand, count]) => ({
+            brand,
+            modelNumber: count,
+          })
+        );
+
+        // Trier et limiter aux 5 premières marques
+        const sortedData = formattedData
+          .sort((a, b) => b.modelNumber - a.modelNumber)
+          .slice(0, 5);
+
+        setChartData(sortedData);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err instanceof Error ? err.message : "Une erreur est survenue");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) return <div>Chargement en cours...</div>;
+  if (error) return <div>Erreur : {error}</div>;
+
   return (
-    <Card>
+    <Card className="w-fit">
       <CardHeader>
-        <CardTitle>Marque les plus spottées</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <CardTitle>Marques les plus spottées</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -50,32 +106,24 @@ export function MostSpottedBrand() {
               left: -20,
             }}
           >
-            <XAxis type="number" dataKey="desktop" hide />
+            <XAxis type="number" dataKey="modelNumber" hide />
             <YAxis
-              dataKey="month"
+              dataKey="brand"
               type="category"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={5} />
+            <Bar dataKey="modelNumber" fill="var(--color-modelNumber)" radius={5} />
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total visitors for the last 6 months
-        </div>
-      </CardFooter>
     </Card>
-  )
-}
+  );
+};
+
 export default MostSpottedBrand;
