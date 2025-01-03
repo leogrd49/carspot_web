@@ -1,22 +1,92 @@
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+"use client";
+import { useState, useEffect, useMemo } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import supabase from "../../../../utils/supabase";
+
+interface RawHeatmapData {
+  day_of_week: number;
+  hour_of_day: number;
+  count: number;
+}
 
 const Heatmap = () => {
-  // Données de test (7 jours x 24 heures)
-  const data = Array(7).fill().map(() => 
-    Array(24).fill().map(() => Math.floor(Math.random() * 100))
-  );
+  const [data, setData] = useState<number[][]>(Array(7).fill(null).map(() => Array(24).fill(0)));
+  const [maxValue, setMaxValue] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
-  const hours = Array(24).fill().map((_, i) => `${String(i).padStart(2, '0')}h`);
+  const days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+  const hours = Array(24).fill(null).map((_, i) => `${String(i).padStart(2, "0")}h`);
 
-  // Trouver la valeur maximale
-  const maxValue = Math.max(...data.flat());
-
-  // Fonction pour déterminer la couleur
-  const getColor = (value) => {
-    const intensity = (value / maxValue);
+  const getColor = useMemo(() => (value: number) => {
+    const intensity = value / maxValue;
     return `rgb(${Math.round(255 * (1 - intensity))}, ${Math.round(255 * (1 - intensity))}, 255)`;
-  };
+  }, [maxValue]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Requête modifiée pour utiliser la syntaxe correcte de Supabase
+        const { data: rawData, error: supabaseError } = await supabase
+          .rpc('get_spot_frequency_heatmap')
+          .returns<RawHeatmapData[]>();
+
+        if (supabaseError) throw supabaseError;
+
+        const heatmapData = Array(7)
+          .fill(null)
+          .map(() => Array(24).fill(0));
+
+        if (rawData) {
+          rawData.forEach((row) => {
+            if (row.day_of_week >= 0 && 
+                row.day_of_week < 7 && 
+                row.hour_of_day >= 0 && 
+                row.hour_of_day < 24) {
+              heatmapData[row.day_of_week][row.hour_of_day] = row.count;
+            }
+          });
+        }
+
+        setData(heatmapData);
+        const max = Math.max(...heatmapData.flat());
+        setMaxValue(max || 1);
+      } catch (err) {
+        console.error("Erreur lors de la récupération des données :", err);
+        setError("Impossible de charger les données");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <Card className="w-fit">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center h-[400px]">
+            <p className="text-gray-500">Chargement des données...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-fit">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center h-[400px]">
+            <p className="text-red-500">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="w-fit">
@@ -26,29 +96,23 @@ const Heatmap = () => {
         </CardHeader>
         <CardContent>
           <div className="flex">
-            {/* Colonne des jours */}
             <div className="flex flex-col mr-2">
-              <div className="h-8" /> {/* Espace pour aligner avec l'en-tête des heures */}
+              <div className="h-8" />
               {days.map((day) => (
                 <div key={day} className="h-12 flex items-center font-medium min-w-24">
                   {day}
                 </div>
               ))}
             </div>
-
-            {/* Zone de défilement pour les heures */}
             <div className="overflow-x-auto">
               <div className="inline-block">
-                {/* En-tête des heures */}
                 <div className="flex mb-2">
-                  {hours.map(hour => (
+                  {hours.map((hour) => (
                     <div key={hour} className="w-12 text-center">
                       {hour}
                     </div>
                   ))}
                 </div>
-
-                {/* Cellules de données */}
                 {data.map((row, rowIndex) => (
                   <div key={rowIndex} className="flex">
                     {row.map((value, colIndex) => (
@@ -57,7 +121,7 @@ const Heatmap = () => {
                         className="w-12 h-12 flex items-center justify-center border border-gray-200"
                         style={{
                           backgroundColor: getColor(value),
-                          color: value > maxValue / 2 ? 'white' : 'black',
+                          color: value > maxValue / 2 ? "white" : "black",
                         }}
                       >
                         {value}
@@ -66,24 +130,6 @@ const Heatmap = () => {
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-
-          {/* Légende */}
-          <div className="mt-6 flex items-center gap-4">
-            <span className="font-medium">Légende:</span>
-            <div className="flex gap-1">
-              {[0, 0.25, 0.5, 0.75, 1].map((fraction) => (
-                <div
-                  key={fraction}
-                  className="w-8 h-8 border border-gray-200 flex items-center justify-center text-xs"
-                  style={{
-                    backgroundColor: getColor(fraction * maxValue)
-                  }}
-                >
-                  {Math.round(fraction * 100)}%
-                </div>
-              ))}
             </div>
           </div>
         </CardContent>

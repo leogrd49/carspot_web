@@ -70,8 +70,6 @@ const TemporalProgression = () => {
           monthlyData[month] = filteredData;
         }
 
-        // Résultat : monthlyData contient les données de chaque mois
-        console.log(monthlyData);
 
         
         // Tableau des noms des mois
