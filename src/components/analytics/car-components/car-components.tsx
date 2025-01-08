@@ -2,6 +2,7 @@
   import SpotFrequency from './spot-frequency';
   import TemporalEvolution from './temporal-evolution';
   import SuperspotRatioAndPopularity from './superspot-ratio-popularity';
+  import SpotPerRarity from './spot-per-rarity'
 
 // Composant pour les statistiques voiture
 const CarStats = () => { 
@@ -10,6 +11,7 @@ const CarStats = () => {
           <SpotFrequency />
           <TemporalEvolution />
           <SuperspotRatioAndPopularity />
+          <SpotPerRarity />
           <PrivilegedSchedules />
       </div>
     );

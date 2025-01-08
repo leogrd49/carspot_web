@@ -1,6 +1,8 @@
   import TemporalProgression from './temporal-progression';
   import RatioSuperspot from './ratio-superspot';
   import MostSpottedBrand from './most-spotted-brand';
+  import MostFollowed from './most-followed'
+  import SpotTemporalEvolution from './spot-temporal-evolution'
 // Composant pour les statistiques utilisateur
 const UserStats = () => {
   
@@ -9,6 +11,8 @@ const UserStats = () => {
         <RatioSuperspot />
         <MostSpottedBrand />
         <TemporalProgression />
+        <MostFollowed />
+        <SpotTemporalEvolution />
       </div>
     );
   };
