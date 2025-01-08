@@ -11,10 +11,8 @@
           <TabsList className="mb-4">
             <TabsTrigger value="user">Statistiques Utilisateur</TabsTrigger>
             <TabsTrigger value="car">Statistiques Voiture</TabsTrigger>
-            <TabsTrigger value="brand">Statistiques Marque</TabsTrigger>
-            <TabsTrigger value="community">Statistiques Communautaires</TabsTrigger>
           </TabsList>
-  
+
           <TabsContent value="user">
             <UserStats />
           </TabsContent>
@@ -23,17 +21,6 @@
             <CarStats />
           </TabsContent>
   
-          <TabsContent value="brand">
-            <div className="text-center p-4">
-              Contenu des statistiques marque à implémenter
-            </div>
-          </TabsContent>
-  
-          <TabsContent value="community">
-            <div className="text-center p-4">
-              Contenu des statistiques communautaires à implémenter
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     );
