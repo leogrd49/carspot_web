@@ -3,6 +3,8 @@
   import MostSpottedBrand from './most-spotted-brand';
   import MostFollowed from './most-followed'
   import SpotTemporalEvolution from './spot-temporal-evolution'
+  import TimeBetweenSpot from './time-between-spot';
+  import FollowersRatioChart from './follower-following-ratio';
 // Composant pour les statistiques utilisateur
 const UserStats = () => {
   
@@ -13,6 +15,8 @@ const UserStats = () => {
         <TemporalProgression />
         <MostFollowed />
         <SpotTemporalEvolution />
+        <TimeBetweenSpot />
+        <FollowersRatioChart />
       </div>
     );
   };
