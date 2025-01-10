@@ -5,7 +5,7 @@
   import SpotTemporalEvolution from './spot-temporal-evolution'
   import TimeBetweenSpot from './time-between-spot';
   import FollowersRatioChart from './follower-following-ratio';
-// Composant pour les statistiques utilisateur
+  import SpotPerUser from './spot-per-user';
 const UserStats = () => {
   
     return (
@@ -17,6 +17,7 @@ const UserStats = () => {
         <SpotTemporalEvolution />
         <TimeBetweenSpot />
         <FollowersRatioChart />
+        <SpotPerUser />
       </div>
     );
   };
