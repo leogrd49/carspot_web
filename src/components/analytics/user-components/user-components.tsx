@@ -6,6 +6,7 @@
   import TimeBetweenSpot from './time-between-spot';
   import FollowersRatioChart from './follower-following-ratio';
   import SpotPerUser from './spot-per-user';
+  import SpotMap from './spot-map'
 const UserStats = () => {
   
     return (
@@ -18,6 +19,7 @@ const UserStats = () => {
         <TimeBetweenSpot />
         <FollowersRatioChart />
         <SpotPerUser />
+        <SpotMap />
       </div>
     );
   };
