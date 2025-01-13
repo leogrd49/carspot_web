@@ -7,6 +7,7 @@ import Home from "./home/home";
 import Dashboard from "./dashboard/dashboard";
 import Analytics from "./analytics/analytics";
 import Journeaux from "./journeaux/journeaux";
+import Tables from './tables/tables.tsx'
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL as string,
@@ -23,6 +24,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/journeaux" element={<Journeaux />} />
+            <Route path="/tables" element={<Tables />} />
           </Routes>
         </Layout>
       </Router>
