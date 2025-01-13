@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
 import Logo from '../assets/LOGO_TRANSPERENT_.png';
+import { NavLink } from 'react-router-dom';
 
 const Navbar = () => {
   const navItems = [
