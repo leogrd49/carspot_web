@@ -1,5 +1,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import ProfileCRUD from '../components/tables/profiles/profiles.tsx'
+import ProfileCRUD from '../components/tables/profiles/profiles.tsx';
+import BrandsCRUD from '../components/tables/brands/brands.tsx';
+import ModelsCRUD from '../components/tables/models/models.tsx'
 
 const Tables = () =>{
     return(
@@ -16,11 +18,11 @@ const Tables = () =>{
           </TabsContent>
   
           <TabsContent value="models">
-            <p></p>
+            <ModelsCRUD />
           </TabsContent>
 
           <TabsContent value="brands">
-            <p></p>
+            <BrandsCRUD />
           </TabsContent>
   
         </Tabs>
