@@ -84,7 +84,7 @@ const RatioSuperspot = () => {
 
 
   return (
-    <Card className="flex flex-col w-fit">
+    <Card className="flex flex-col w-[33%]">
       <CardHeader className="items-center pb-0">
         <CardTitle>Super Spot Ratio</CardTitle>
       </CardHeader>

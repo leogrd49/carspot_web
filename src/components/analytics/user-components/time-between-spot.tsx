@@ -112,7 +112,7 @@ const TimeBetweenSpot = () => {
   };
 
   return (
-    <Card>
+    <Card className="w-[30%]">
       <CardHeader>
         <CardTitle className="text-lg">
           Temps moyen entre les spots

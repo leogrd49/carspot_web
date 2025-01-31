@@ -110,7 +110,7 @@ const Component = () => {
 
 
   return (
-    <Card>
+    <Card className="w-[33%]">
       <CardHeader>
         <CardTitle>Évolution des Spots</CardTitle>
         <CardDescription>January - June 2024</CardDescription>

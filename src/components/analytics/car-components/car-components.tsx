@@ -11,8 +11,8 @@ const CarStats = () => {
           <SpotFrequency />
           <TemporalEvolution />
           <SuperspotRatioAndPopularity />
-          <SpotPerRarity />
           <PrivilegedSchedules />
+          <SpotPerRarity />
       </div>
     );
   };

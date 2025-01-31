@@ -92,7 +92,7 @@ const MostSpottedBrand = () => {
   if (error) return <div>Erreur : {error}</div>;
 
   return (
-    <Card className="w-fit">
+    <Card className="w-[33%]">
       <CardHeader>
         <CardTitle>Marques les plus spottées</CardTitle>
       </CardHeader>
@@ -103,7 +103,7 @@ const MostSpottedBrand = () => {
             data={chartData}
             layout="vertical"
             margin={{
-              left: -20,
+              left: 40,
             }}
           >
             <XAxis type="number" dataKey="modelNumber" hide />

@@ -14,12 +14,12 @@ const UserStats = () => {
         <RatioSuperspot />
         <MostSpottedBrand />
         <TemporalProgression />
+        <SpotMap />
         <MostFollowed />
         <SpotTemporalEvolution />
         <TimeBetweenSpot />
         <FollowersRatioChart />
         <SpotPerUser />
-        <SpotMap />
       </div>
     );
   };

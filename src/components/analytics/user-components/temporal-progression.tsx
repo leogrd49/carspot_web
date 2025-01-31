@@ -114,7 +114,7 @@ const TemporalProgression = () => {
 
   
   return (
-    <Card>
+    <Card className="w-[30%]">
       <CardHeader>
         <CardTitle>Progression temporelle</CardTitle>
         <CardDescription>January - June 2024</CardDescription>

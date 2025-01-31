@@ -105,7 +105,7 @@ const TemporalEvolution = () => {
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <Card>
+    <Card className="w-[33%]">
       <CardHeader>
         <CardTitle>Temporal Evolution</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
