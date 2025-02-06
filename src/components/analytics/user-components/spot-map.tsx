@@ -71,7 +71,7 @@ const SpotMap = () => {
   }, [spots]);
 
   return (
-    <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
+    <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg z-[2]">
       <div id="map" className="w-full h-full" />
     </div>
   );
