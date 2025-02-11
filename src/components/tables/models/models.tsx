@@ -23,17 +23,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ArrowUpDown, Trash } from "lucide-react";
+import { ArrowUpDown, Trash, Filter } from "lucide-react";
 
 interface Model {
   id: number;
   brands_id: number;
-  brand_name: string; // Nom de la marque via la jointure
+  brand_name: string;
   name: string;
   price: number;
   series: string;
   variant: string;
-  rarity: string; // Code couleur pour cette colonne
+  rarity: string;
+  type?: string; // Nouveau champ optionnel pour le type de véhicule
   engine?: string;
   horsepower?: number;
   torque?: number;
@@ -77,6 +78,15 @@ const ModelsTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [editingModel, setEditingModel] = useState<Model | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [selectedType, setSelectedType] = useState<string>(""); // Nouvel état pour gérer le filtre de type
+
+
+   // Options disponibles pour les types de véhicules
+  const vehicleTypes = [
+    { value: "", label: "Tous les types" },
+    { value: "voiture", label: "Voitures" },
+    { value: "camion", label: "Camions" },
+  ];
 
   const rarityColors: Record<string, string> = {
     common: "bg-gray-100 text-gray-800",
@@ -121,6 +131,15 @@ const ModelsTable = () => {
         );
       },
     },
+    // Ajout de la colonne type dans la définition des colonnes
+    {
+      accessorKey: "type",
+      header: "Type",
+      cell: ({ row }) => {
+        const type = row.getValue("type") as string;
+        return type ? type.charAt(0).toUpperCase() + type.slice(1) : "Non défini";
+      },
+    },
     {
       id: "actions",
       header: "Actions",
@@ -142,25 +161,34 @@ const ModelsTable = () => {
     },
   ];
 
+  // Modification de la fonction fetchData pour inclure le filtre de type
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const start = pageIndex * pageSize;
       const end = start + pageSize - 1;
 
-      const { data, error, count } = await supabase
+      let query = supabase
         .from("models")
         .select(
-          "id, name, price, series, variant, rarity, brands!inner(name)",
+          "id, name, price, series, variant, rarity, brands!inner(name), type", // Ajout du champ type
           { count: "exact" }
-        )
-        .range(start, end);
+        );
 
-      if (error) throw error;
+    // Application du filtre de type si un type est sélectionné
+      if (selectedType) {
+        query = query.eq('type', selectedType);
+      }
 
-      const transformedData = (data || []).map((item: any) => ({
+      query = query.range(start, end);
+
+      const { data: fetchedData, error: fetchError, count } = await query;
+
+      if (fetchError) throw fetchError;
+
+      const transformedData = (fetchedData || []).map((item: any) => ({
         ...item,
-        brand_name: item.brands?.name || "Unknown", // Gérer les marques nulles
+        brand_name: item.brands?.name || "Unknown",
       }));
 
       setData(transformedData as Model[]);
@@ -172,9 +200,10 @@ const ModelsTable = () => {
     }
   };
 
+  // Ajout de selectedType dans les dépendances pour recharger les données quand le filtre change
   useEffect(() => {
     fetchData();
-  }, [pageIndex, pageSize, sorting]);
+  }, [pageIndex, pageSize, sorting, selectedType]);
 
   const table = useReactTable({
     data,
@@ -230,12 +259,32 @@ const ModelsTable = () => {
 
   return (
     <Card>
-      <CardHeader className="flex justify-between items-center">
-        <CardTitle className="text-lg">Models Table</CardTitle>
-        <Button onClick={() => { setEditingModel(null); setIsDialogOpen(true); }}>
-          New Model
-        </Button>
+      <CardHeader className="flex flex-col space-y-4">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-lg">Models Table</CardTitle>
+          <Button onClick={() => { setEditingModel(null); setIsDialogOpen(true); }}>
+            New Model
+          </Button>
+        </div>
+
+
+        {/* Ajout du filtre de type */}
+        <div className="flex items-center space-x-2">
+          <Filter size={16} /> {/* Icône de filtre */}
+          <select
+            className="px-3 py-2 border rounded-md w-[200px]"
+            value={selectedType}
+            onChange={(e) => setSelectedType(e.target.value)}
+          >
+            {vehicleTypes.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </CardHeader>
+
       <CardContent>
         <div className="space-y-4">
           <div className="rounded-md border">
@@ -336,6 +385,18 @@ const ModelsTable = () => {
                 placeholder="Rarity"
                 defaultValue={editingModel?.rarity || ""}
               />
+                {/* Ajout du select pour le type dans le formulaire */}
+              <select
+                name="type"
+                defaultValue={editingModel?.type || ""}
+                className="w-full px-3 py-2 border rounded-md"
+              >
+                {vehicleTypes.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
               <Button type="submit">
                 {editingModel ? "Save Changes" : "Create Model"}
               </Button>
