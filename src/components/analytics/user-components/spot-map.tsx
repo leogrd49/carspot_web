@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import L from 'leaflet';
+import marker from '../../../assets/marker.png'
 import 'leaflet/dist/leaflet.css';
 import supabase from "../../../../utils/supabase";
 
@@ -48,7 +49,7 @@ const SpotMap = () => {
       }).addTo(mapRef.current);
     }
     var myIcon = L.icon({
-        iconUrl: '../../../assets/marker.png',
+        iconUrl: marker,
         iconSize: [38, 45],
 
     });
