@@ -41,9 +41,9 @@ const Heatmap = () => {
 
         if (rawData) {
           rawData.forEach((row) => {
-            if (row.day_of_week >= 0 && 
-                row.day_of_week < 7 && 
-                row.hour_of_day >= 0 && 
+            if (row.day_of_week >= 0 &&
+                row.day_of_week < 7 &&
+                row.hour_of_day >= 0 &&
                 row.hour_of_day < 24) {
               heatmapData[row.day_of_week][row.hour_of_day] = row.count;
             }

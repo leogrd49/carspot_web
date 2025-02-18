@@ -54,7 +54,7 @@ const MostSpottedBrand = () => {
 
         if (error) throw error;
 
-        
+
         // Transformation des données pour le graphique
         const brandCounts = data.reduce((acc: Record<string, number>, item: any) => {
           const brandName = item.models?.brands?.name;
@@ -92,7 +92,7 @@ const MostSpottedBrand = () => {
   if (error) return <div>Erreur : {error}</div>;
 
   return (
-    <Card className="w-[33%]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Marques les plus spottées</CardTitle>
       </CardHeader>

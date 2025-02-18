@@ -91,7 +91,7 @@ const SuperspotRatioAndPopularity = () => {
 
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader className="items-center pb-4">
         <CardTitle>Super Spot Ratio & Popularity</CardTitle>
         <CardDescription>

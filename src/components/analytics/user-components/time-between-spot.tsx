@@ -68,7 +68,7 @@ const TimeBetweenSpot = () => {
             const diff = user.spotted_dates[i].getTime() - user.spotted_dates[i-1].getTime();
             differences.push(diff);
           }
-          
+
           const averageTimeDiff = differences.length > 0
             ? differences.reduce((a, b) => a + b, 0) / differences.length
             : 0;
@@ -112,7 +112,7 @@ const TimeBetweenSpot = () => {
   };
 
   return (
-    <Card className="w-[30%]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg">
           Temps moyen entre les spots

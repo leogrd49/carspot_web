@@ -71,7 +71,7 @@ const SpotPerUser = () => {
   }, []);
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg">
           Nombre moyen de spots par utilisateur

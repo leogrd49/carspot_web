@@ -120,6 +120,10 @@ const ModelsTable = () => {
       header: "Variant",
     },
     {
+        accessorKey: "acceleration_0_100",
+        header: "acceleration_0_100",
+      },
+    {
       accessorKey: "rarity",
       header: "Rarity",
       cell: ({ row }) => {
@@ -384,6 +388,11 @@ const ModelsTable = () => {
                 name="rarity"
                 placeholder="Rarity"
                 defaultValue={editingModel?.rarity || ""}
+              />
+              <Input
+                name="acceleration_0_100"
+                placeholder="acceleration_0_100"
+                defaultValue={editingModel?.acceleration_0_100 || ""}
               />
                 {/* Ajout du select pour le type dans le formulaire */}
               <select

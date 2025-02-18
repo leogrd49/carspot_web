@@ -45,7 +45,7 @@ const TemporalEvolution = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch brands and models data in parallel
         const [brandsResult, modelsResult] = await Promise.all([
           supabase.from("brands").select("*"),
@@ -56,19 +56,19 @@ const TemporalEvolution = () => {
         if (modelsResult.error) throw modelsResult.error;
 
         const monthNames = [
-          "January", "February", "March", "April", 
+          "January", "February", "March", "April",
           "May", "June", "July", "August",
           "September", "October", "November", "December"
         ];
 
         const processData = (data: DataItem[]) => {
           const monthlyData = Array.from({ length: 12 }, () => [] as DataItem[]);
-          
+
           data.forEach(item => {
             const month = new Date(item.created_at).getMonth();
             monthlyData[month].push(item);
           });
-          
+
           return monthlyData;
         };
 
@@ -81,7 +81,7 @@ const TemporalEvolution = () => {
         const chartData = monthNames.map((month, index) => {
           cumulativeBrands += brandsByMonth[index].length;
           cumulativeModels += modelsByMonth[index].length;
-          
+
           return {
             month,
             brands: cumulativeBrands,
@@ -105,7 +105,7 @@ const TemporalEvolution = () => {
   if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
 
   return (
-    <Card className="w-[33%]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Temporal Evolution</CardTitle>
         <CardDescription>January - June 2024</CardDescription>

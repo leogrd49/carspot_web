@@ -35,7 +35,7 @@ interface ChartData {
   }
 
 const Component = () => {
-  
+
     const [ChartData, setChartData] = useState<ChartData[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -60,17 +60,17 @@ const Component = () => {
             const date = new Date(item.created_at);
             return date.getMonth() === month; // 0 = janvier
           });
-          
+
           // Stocker les données filtrées dans le tableau par mois
           monthlyData[month] = filteredData;
         }
 
 
-        
+
         // Tableau des noms des mois
         const monthNames = [
-          "January", "February", "March", "April", 
-          "May", "June", "July", "August", 
+          "January", "February", "March", "April",
+          "May", "June", "July", "August",
           "September", "October", "November", "December"
         ];
 
@@ -110,7 +110,7 @@ const Component = () => {
 
 
   return (
-    <Card className="w-[33%]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Évolution des Spots</CardTitle>
         <CardDescription>January - June 2024</CardDescription>

@@ -43,7 +43,7 @@ const TemporalProgression = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
- 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -53,7 +53,7 @@ const TemporalProgression = () => {
         const { data, error } = await supabase
           .from("profiles")
           .select(`*`)
-          
+
         if (error) throw error;
 
         // Initialisation du tableau de regroupement par mois
@@ -65,17 +65,17 @@ const TemporalProgression = () => {
             const date = new Date(item.created_at);
             return date.getMonth() === month; // 0 = janvier
           });
-          
+
           // Stocker les données filtrées dans le tableau par mois
           monthlyData[month] = filteredData;
         }
 
 
-        
+
         // Tableau des noms des mois
         const monthNames = [
-          "January", "February", "March", "April", 
-          "May", "June", "July", "August", 
+          "January", "February", "March", "April",
+          "May", "June", "July", "August",
           "September", "October", "November", "December"
         ];
 
@@ -112,9 +112,9 @@ const TemporalProgression = () => {
   if (isLoading) return <div>Chargement en cours...</div>;
   if (error) return <div>Erreur : {error}</div>;
 
-  
+
   return (
-    <Card className="w-[30%]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Progression temporelle</CardTitle>
         <CardDescription>January - June 2024</CardDescription>

@@ -48,15 +48,15 @@ const UserStatsPage = () => {
   }, []);
 
   if (isLoading) {
-    return <div>Chargement...</div>;
+    return <div className="flex justify-center items-center h-40">Chargement...</div>;
   }
 
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">Statistiques Globales</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <h1 className="text-2xl sm:text-3xl font-bold">Statistiques Globales</h1>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <MetricWithTrend
           title="Total Spots"
           value={totalSpots}

@@ -8,7 +8,7 @@ const Tables = () =>{
     <div className="p-4">
         <Tabs defaultValue="profiles" className="w-full">
           <TabsList className="mb-4">
-            <TabsTrigger value="profiles">CRUD Profiles</TabsTrigger>
+            <TabsTrigger value="profiles">Read Update Profiles</TabsTrigger>
             <TabsTrigger value="models">CRUD Modeles</TabsTrigger>
             <TabsTrigger value="brands">CRUD Marques</TabsTrigger>
           </TabsList>
@@ -16,7 +16,7 @@ const Tables = () =>{
           <TabsContent value="profiles">
             <ProfileCRUD />
           </TabsContent>
-  
+
           <TabsContent value="models">
             <ModelsCRUD />
           </TabsContent>
@@ -24,7 +24,7 @@ const Tables = () =>{
           <TabsContent value="brands">
             <BrandsCRUD />
           </TabsContent>
-  
+
         </Tabs>
       </div>)
 }

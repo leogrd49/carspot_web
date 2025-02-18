@@ -146,11 +146,11 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({ value, className }) => {
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
-          <RadialBarChart 
-            innerRadius="60%" 
-            outerRadius="100%" 
-            data={data} 
-            startAngle={180} 
+          <RadialBarChart
+            innerRadius="60%"
+            outerRadius="100%"
+            data={data}
+            startAngle={180}
             endAngle={0}
           >
             <RadialBar

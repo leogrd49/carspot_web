@@ -76,7 +76,7 @@ const SpotPerRarity = () => {
 
         // Tri des données par rareté
         const rarityOrder = ['common', 'uncommon', 'rare', 'very_rare', 'legendary', 'mythic'];
-        formattedData.sort((a, b) => 
+        formattedData.sort((a, b) =>
           rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity)
         );
 
@@ -97,7 +97,7 @@ const SpotPerRarity = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Distribution des voitures par rareté</CardTitle>
         <CardDescription>Vue d'ensemble de la collection</CardDescription>

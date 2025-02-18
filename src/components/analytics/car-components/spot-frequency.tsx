@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import supabase from "../../../../utils/supabase";
 
 import { Card, CardContent } from '@/components/ui/card';
-import { 
+import {
   BarChart, Bar,
-  XAxis, YAxis, CartesianGrid, Tooltip, 
+  XAxis, YAxis, CartesianGrid, Tooltip,
 } from 'recharts';
 
 // Interface pour les données du graphique
@@ -20,8 +20,8 @@ const SpotFrequency = () =>{
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [, setIsLoading] = useState<boolean>(true);
   const [, setError] = useState<string | null>(null);
-  
-  
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -31,7 +31,7 @@ const SpotFrequency = () =>{
         const { data, error } = await supabase
           .from("user_collections")
           .select(`*`)
-          
+
         if (error) throw error;
 
         // Initialisation du tableau de regroupement par mois
@@ -43,19 +43,19 @@ const SpotFrequency = () =>{
             const date = new Date(item.created_at);
             return date.getMonth() === month; // 0 = janvier
           });
-          
+
           // Stocker les données filtrées dans le tableau par mois
           monthlyData[month] = filteredData;
         }
-        
+
         // Tableau des noms des mois
         const monthNames = [
-          "January", "February", "March", "April", 
-          "May", "June", "July", "August", 
+          "January", "February", "March", "April",
+          "May", "June", "July", "August",
           "September", "October", "November", "December"
         ];
 
-       
+
 
         const chartData = monthlyData.map((monthData, index) => {
           return {
@@ -79,7 +79,7 @@ const SpotFrequency = () =>{
   }, []);
 
     return (
-        <Card>
+        <Card className="w-full">
           <CardContent className="pt-6">
             <h3 className="text-lg font-semibold mb-4">Fréquence Spots</h3>
             <BarChart width={400} height={300} data={chartData}>

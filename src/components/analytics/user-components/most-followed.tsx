@@ -76,7 +76,7 @@ const MostFollowed = () => {
   }, []);
 
   return (
-    <Card className="w-[33%]">
+    <Card className="w-full">
       <CardHeader>
         <CardTitle>Utilisateurs les plus suivis</CardTitle>
         <CardDescription>January - June 2024</CardDescription>
