@@ -5,6 +5,7 @@ import supabase from '../../utils/supabase.tsx';
 const UserStatsPage = () => {
   const [totalSpots, setTotalSpots] = useState(0);
   const [totalModels, setTotalModels] = useState(0);
+  const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +44,25 @@ const UserStatsPage = () => {
       }
     };
 
+    const fetchTotalUsers = async () => {
+        try {
+          const { count: usersCount, error: usersError } = await supabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+
+          if (usersError) throw usersError;
+
+          setTotalUsers(usersCount ?? 0);
+        } catch (error) {
+          console.error('Error fetching total spots:', error);
+          setTotalUsers(0);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
     fetchTotalSpots();
+    fetchTotalUsers();
     fetchTotalModels();
   }, []);
 
@@ -65,6 +84,11 @@ const UserStatsPage = () => {
         <MetricWithTrend
           title="Nombre Model"
           value={totalModels}
+          trend={0}
+        />
+        <MetricWithTrend
+          title="Nombre Users"
+          value={totalUsers}
           trend={0}
         />
       </div>

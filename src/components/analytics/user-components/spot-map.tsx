@@ -47,12 +47,17 @@ const SpotMap = () => {
         attribution: '© OpenStreetMap contributors',
       }).addTo(mapRef.current);
     }
+    var myIcon = L.icon({
+        iconUrl: 'marker.png',
+        iconSize: [38, 45],
+
+    });
 
     // Ajout des marqueurs sur la carte
     if (mapRef.current && spots.length) {
       spots.forEach((spot) => {
         if (spot.latitude && spot.longitude) {
-          L.marker([spot.latitude, spot.longitude])
+          L.marker([spot.latitude, spot.longitude], {icon: myIcon})
             .addTo(mapRef.current!)
             .bindPopup(`<strong>${spot.name}</strong>`);
         } else {
