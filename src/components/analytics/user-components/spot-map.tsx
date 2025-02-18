@@ -48,7 +48,7 @@ const SpotMap = () => {
       }).addTo(mapRef.current);
     }
     var myIcon = L.icon({
-        iconUrl: 'marker.png',
+        iconUrl: 'src/assets/marker.png',
         iconSize: [38, 45],
 
     });
