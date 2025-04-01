@@ -1,4 +1,4 @@
-import supabase from "../../../../utils/supabase";
+import postgres from "../../../../utils/postgres";
 import { useState, useEffect } from "react";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 import {
@@ -46,10 +46,10 @@ const TemporalEvolution = () => {
       try {
         setIsLoading(true);
 
-        // Fetch brands and models data in parallel
+        // Fetch brands and models data in parallel using PostgreSQL
         const [brandsResult, modelsResult] = await Promise.all([
-          supabase.from("brands").select("*"),
-          supabase.from("models").select("*")
+          postgres.query(`SELECT created_at FROM brands`),
+          postgres.query(`SELECT created_at FROM models`)
         ]);
 
         if (brandsResult.error) throw brandsResult.error;
@@ -64,7 +64,7 @@ const TemporalEvolution = () => {
         const processData = (data: DataItem[]) => {
           const monthlyData = Array.from({ length: 12 }, () => [] as DataItem[]);
 
-          data.forEach(item => {
+          data.forEach((item: DataItem) => {
             const month = new Date(item.created_at).getMonth();
             monthlyData[month].push(item);
           });

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import supabase from "../../../../utils/supabase";
+import postgres from "../../../../utils/postgres";
 
 interface RawHeatmapData {
   day_of_week: number;
@@ -28,19 +28,17 @@ const Heatmap = () => {
       setIsLoading(true);
       setError(null);
       try {
-        // Requête modifiée pour utiliser la syntaxe correcte de Supabase
-        const { data: rawData, error: supabaseError } = await supabase
-          .rpc('get_spot_frequency_heatmap')
-          .returns<RawHeatmapData[]>();
+        // Modified query to use PostgreSQL instead of Supabase
+        const { data: rawData, error: pgError } = await postgres.rpc('get_spot_frequency_heatmap');
 
-        if (supabaseError) throw supabaseError;
+        if (pgError) throw pgError;
 
         const heatmapData = Array(7)
           .fill(null)
           .map(() => Array(24).fill(0));
 
         if (rawData) {
-          rawData.forEach((row) => {
+          rawData.forEach((row: RawHeatmapData) => {
             if (row.day_of_week >= 0 &&
                 row.day_of_week < 7 &&
                 row.hour_of_day >= 0 &&

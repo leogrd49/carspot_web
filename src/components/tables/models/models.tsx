@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import supabase from "../../../../utils/supabase";
+import postgres from "../../../../utils/postgres";
 import {
   ColumnDef,
   SortingState,
@@ -34,7 +34,7 @@ interface Model {
   series: string;
   variant: string;
   rarity: string;
-  type?: string; // Nouveau champ optionnel pour le type de véhicule
+  type?: string;
   engine?: string;
   horsepower?: number;
   torque?: number;
@@ -78,10 +78,8 @@ const ModelsTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [editingModel, setEditingModel] = useState<Model | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [selectedType, setSelectedType] = useState<string>(""); // Nouvel état pour gérer le filtre de type
+  const [selectedType, setSelectedType] = useState<string>("");
 
-
-   // Options disponibles pour les types de véhicules
   const vehicleTypes = [
     { value: "", label: "Tous les types" },
     { value: "voiture", label: "Voitures" },
@@ -120,9 +118,9 @@ const ModelsTable = () => {
       header: "Variant",
     },
     {
-        accessorKey: "acceleration_0_100",
-        header: "acceleration_0_100",
-      },
+      accessorKey: "acceleration_0_100",
+      header: "acceleration_0_100",
+    },
     {
       accessorKey: "rarity",
       header: "Rarity",
@@ -135,7 +133,6 @@ const ModelsTable = () => {
         );
       },
     },
-    // Ajout de la colonne type dans la définition des colonnes
     {
       accessorKey: "type",
       header: "Type",
@@ -165,38 +162,81 @@ const ModelsTable = () => {
     },
   ];
 
-  // Modification de la fonction fetchData pour inclure le filtre de type
   const fetchData = async () => {
     try {
       setIsLoading(true);
       const start = pageIndex * pageSize;
-      const end = start + pageSize - 1;
+      const end = pageSize;
 
-      let query = supabase
-        .from("models")
-        .select(
-          "id, name, price, series, variant, rarity, brands!inner(name), type", // Ajout du champ type
-          { count: "exact" }
-        );
+      // Build the SQL query with all filters
+      let queryParams = [];
+      let queryText = `
+        SELECT 
+          m.id, 
+          m.name, 
+          m.price, 
+          m.series, 
+          m.variant, 
+          m.rarity, 
+          m.type,
+          m.acceleration_0_100,
+          b.name as brand_name
+        FROM 
+          models m
+        JOIN 
+          brands b ON m.brands_id = b.id
+      `;
 
-    // Application du filtre de type si un type est sélectionné
+      // Apply type filter if selected
       if (selectedType) {
-        query = query.eq('type', selectedType);
+        queryText += ` WHERE m.type = $1`;
+        queryParams.push(selectedType);
       }
 
-      query = query.range(start, end);
+      // Apply sorting
+      if (sorting.length > 0) {
+        const { id, desc } = sorting[0];
+        const direction = desc ? 'DESC' : 'ASC';
+        
+        // For brand_name we need to sort by the brands table
+        if (id === 'brand_name') {
+          queryText += ` ORDER BY b.name ${direction}`;
+        } else {
+          queryText += ` ORDER BY m.${id} ${direction}`;
+        }
+      } else {
+        queryText += ` ORDER BY m.id ASC`;
+      }
 
-      const { data: fetchedData, error: fetchError, count } = await query;
+      // Add limit and offset for pagination
+      queryText += ` LIMIT $${queryParams.length + 1} OFFSET $${queryParams.length + 2}`;
+      queryParams.push(end, start);
+
+      // Execute the main query
+      const { data: fetchedData, error: fetchError } = await postgres.query(queryText, queryParams);
 
       if (fetchError) throw fetchError;
 
-      const transformedData = (fetchedData || []).map((item: any) => ({
-        ...item,
-        brand_name: item.brands?.name || "Unknown",
-      }));
+      // Count query for pagination
+      let countQueryText = `
+        SELECT COUNT(*) 
+        FROM models m
+        JOIN brands b ON m.brands_id = b.id
+      `;
+      
+      if (selectedType) {
+        countQueryText += ` WHERE m.type = $1`;
+      }
 
-      setData(transformedData as Model[]);
-      setTotalCount(count || 0);
+      const { data: countData, error: countError } = await postgres.query(
+        countQueryText, 
+        selectedType ? [selectedType] : []
+      );
+
+      if (countError) throw countError;
+
+      setData(fetchedData as Model[]);
+      setTotalCount(parseInt(countData[0].count));
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error fetching models");
     } finally {
@@ -204,7 +244,6 @@ const ModelsTable = () => {
     }
   };
 
-  // Ajout de selectedType dans les dépendances pour recharger les données quand le filtre change
   useEffect(() => {
     fetchData();
   }, [pageIndex, pageSize, sorting, selectedType]);
@@ -228,18 +267,61 @@ const ModelsTable = () => {
 
   const handleSave = async (model: Partial<Model>) => {
     try {
-      let response;
+      let result;
       if (editingModel) {
-        response = await supabase
-          .from("models")
-          .update(model)
-          .eq("id", editingModel.id);
+        // Update existing model
+        const queryText = `
+          UPDATE models 
+          SET 
+            name = $1, 
+            price = $2, 
+            series = $3, 
+            variant = $4, 
+            rarity = $5,
+            acceleration_0_100 = $6,
+            type = $7
+          WHERE id = $8
+          RETURNING *
+        `;
+        
+        const queryParams = [
+          model.name, 
+          model.price, 
+          model.series, 
+          model.variant, 
+          model.rarity, 
+          model.acceleration_0_100,
+          model.type,
+          editingModel.id
+        ];
+        
+        result = await postgres.query(queryText, queryParams);
       } else {
-        response = await supabase.from("models").insert(model);
+        // Insert new model
+        const queryText = `
+          INSERT INTO models (
+            name, price, series, variant, rarity, acceleration_0_100, type, brands_id
+          ) VALUES (
+            $1, $2, $3, $4, $5, $6, $7, $8
+          ) RETURNING *
+        `;
+        
+        const queryParams = [
+          model.name, 
+          model.price, 
+          model.series, 
+          model.variant, 
+          model.rarity, 
+          model.acceleration_0_100,
+          model.type,
+          model.brands_id || 1 // Default to brand ID 1 if not provided
+        ];
+        
+        result = await postgres.query(queryText, queryParams);
       }
 
-      if (response.error) {
-        throw new Error(response.error.message);
+      if (result.error) {
+        throw new Error(result.error.message);
       }
 
       setIsDialogOpen(false);
@@ -251,7 +333,8 @@ const ModelsTable = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const { error } = await supabase.from("models").delete().eq("id", id);
+      const queryText = `DELETE FROM models WHERE id = $1 RETURNING *`;
+      const { error } = await postgres.query(queryText, [id]);
 
       if (error) throw error;
 
@@ -270,7 +353,6 @@ const ModelsTable = () => {
             New Model
           </Button>
         </div>
-
 
         {/* Ajout du filtre de type */}
         <div className="flex items-center space-x-2">
@@ -394,7 +476,6 @@ const ModelsTable = () => {
                 placeholder="acceleration_0_100"
                 defaultValue={editingModel?.acceleration_0_100 || ""}
               />
-                {/* Ajout du select pour le type dans le formulaire */}
               <select
                 name="type"
                 defaultValue={editingModel?.type || ""}

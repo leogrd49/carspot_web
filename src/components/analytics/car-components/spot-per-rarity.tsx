@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { TrendingUp } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts"
-import supabase from "../../../../utils/supabase";
+import postgres from "../../../../utils/postgres";
 import {
   Card,
   CardContent,
@@ -25,7 +25,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-// Interface mise à jour pour correspondre à la structure exacte de Supabase
+// Interface mise à jour pour correspondre à la structure exacte de la base de données
 interface CollectionData {
   id: string;
   model_id: number;
@@ -48,40 +48,37 @@ const SpotPerRarity = () => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const { data, error } = await supabase
-          .from('user_collections')
-          .select(`
-            id,
-            model_id,
-            models(
-              rarity
-            )
-          `);
+        
+        // Use PostgreSQL with a more complex query
+        const { data, error } = await postgres.query(`
+          SELECT 
+            m.rarity, 
+            COUNT(*) as count
+          FROM 
+            user_collections uc
+          JOIN 
+            models m ON uc.model_id = m.id
+          GROUP BY 
+            m.rarity
+          ORDER BY 
+            m.rarity
+        `);
 
         if (error) throw error;
 
-        // Transformation des données avec le type correct
-        const rarityCount = data.reduce((acc, item) => {
-          // Accès au premier élément du tableau models s'il existe
-          const rarity = item.models.rarity.toLowerCase() || 'Unknown';
-          acc[rarity] = (acc[rarity] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
-
-
-        const formattedData = Object.entries(rarityCount).map(([rarity, count]) => ({
-          rarity,
-          desktop: count
+        // Format data for chart
+        const formattedData = data.map((item: any) => ({
+          rarity: item.rarity.toLowerCase() || 'Unknown',
+          desktop: parseInt(item.count)
         }));
 
-        // Tri des données par rareté
+        // Sort rarities in the correct order
         const rarityOrder = ['common', 'uncommon', 'rare', 'very_rare', 'legendary', 'mythic'];
         formattedData.sort((a, b) =>
           rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity)
         );
 
         setChartData(formattedData);
-
       } catch (err) {
         console.error("Error fetching rarity distribution:", err);
         setError(err instanceof Error ? err.message : "An error occurred");

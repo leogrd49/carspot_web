@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart } from "recharts";
-import supabase from "../../../../utils/supabase";
+import postgres from "../../../../utils/postgres";
 
 import {
   Card,
@@ -32,17 +32,19 @@ const chartConfig = {
 
 const SuperspotRatioAndPopularity = () => {
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
-  const [, setIsLoading] = useState<boolean>(true);
-  const [, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMonthlyData = async () => {
       try {
         setIsLoading(true);
 
-        const { data, error } = await supabase
-          .from("user_collections")
-          .select("created_at, superspot");
+        // PostgreSQL query to get all collections with created_at and superspot status
+        const { data, error } = await postgres.query(`
+          SELECT created_at, superspot 
+          FROM user_collections
+        `);
 
         if (error) throw error;
 
@@ -54,12 +56,12 @@ const SuperspotRatioAndPopularity = () => {
         ];
 
         const monthlyData = Array.from({ length: 12 }, (_, index) => {
-          const monthItems = data.filter((item) => {
+          const monthItems = data.filter((item: any) => {
             const date = new Date(item.created_at);
             return date.getMonth() === index;
           });
 
-          const totalSuperspot = monthItems.filter((item) => item.superspot)
+          const totalSuperspot = monthItems.filter((item: any) => item.superspot)
             .length;
           const totalSpot = monthItems.length;
 
@@ -77,7 +79,6 @@ const SuperspotRatioAndPopularity = () => {
         });
 
         setMonthlyData(monthlyData);
-
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err instanceof Error ? err.message : "An error occurred");
@@ -88,7 +89,6 @@ const SuperspotRatioAndPopularity = () => {
 
     fetchMonthlyData();
   }, []);
-
 
   return (
     <Card className="w-full">

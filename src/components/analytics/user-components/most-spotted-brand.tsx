@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
-import supabase from "../../../../utils/supabase";
+import postgres from "../../../../utils/postgres";
 import {
   Card,
   CardContent,
@@ -38,45 +38,35 @@ const MostSpottedBrand = () => {
       try {
         setIsLoading(true);
 
-        // Requête avec jointures et comptage
-        const { data, error } = await supabase
-          .from("user_collections")
-          .select(`
-            model_id,
-            models (
-              brand_id,
-              brands (
-                name
-              )
-            )
-          `)
-          .eq("spotted", true);
+        // PostgreSQL query with JOIN and COUNT
+        const { data, error } = await postgres.query(`
+          SELECT 
+            b.name as brand, 
+            COUNT(*) as model_number
+          FROM 
+            user_collections uc
+          JOIN 
+            models m ON uc.model_id = m.id
+          JOIN 
+            brands b ON m.brand_id = b.id
+          WHERE 
+            uc.spotted = true
+          GROUP BY 
+            b.name
+          ORDER BY 
+            model_number DESC
+          LIMIT 5
+        `);
 
         if (error) throw error;
 
+        // Transform data for the chart
+        const formattedData: ChartData[] = data.map((item: any) => ({
+          brand: item.brand,
+          modelNumber: parseInt(item.model_number)
+        }));
 
-        // Transformation des données pour le graphique
-        const brandCounts = data.reduce((acc: Record<string, number>, item: any) => {
-          const brandName = item.models?.brands?.name;
-          if (brandName) {
-            acc[brandName] = (acc[brandName] || 0) + 1;
-          }
-          return acc;
-        }, {});
-
-        const formattedData: ChartData[] = Object.entries(brandCounts).map(
-          ([brand, count]) => ({
-            brand,
-            modelNumber: count,
-          })
-        );
-
-        // Trier et limiter aux 5 premières marques
-        const sortedData = formattedData
-          .sort((a, b) => b.modelNumber - a.modelNumber)
-          .slice(0, 5);
-
-        setChartData(sortedData);
+        setChartData(formattedData);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError(err instanceof Error ? err.message : "Une erreur est survenue");
