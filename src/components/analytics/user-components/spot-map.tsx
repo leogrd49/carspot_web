@@ -77,9 +77,6 @@
         fetchData();
       }, []);
 
-
-
-
     useEffect(() => {
         if (!mapRef.current) {
           mapRef.current = L.map('map', {
